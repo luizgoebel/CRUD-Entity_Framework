@@ -1,5 +1,4 @@
-﻿using CRUD_Entity_Framework.Models.Entidades;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace CRUD_Entity_Framework.Models;
 
@@ -10,8 +9,4 @@ public class FilmeResponse
     public string Nome { get; set; }
     public int Ano { get; set; }
     public string Produtora { get; set; }
-    public Filme MapFilmeResponseToFilme()
-    {
-        return new(this.Nome, this.Ano);
-    }
 }

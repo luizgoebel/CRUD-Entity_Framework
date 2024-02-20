@@ -25,7 +25,6 @@ public class FilmeRepository : IFilmeRepository
             int registrosAfetados = await _dbContext.SaveChangesAsync();
 
             return registrosAfetados > 0 ? "Adicionado com sucesso." : throw new Exception("Não foi possível adicionar o filme.");
-
         }
         catch (Exception)
         {
@@ -37,10 +36,10 @@ public class FilmeRepository : IFilmeRepository
     {
         try
         {
-            FilmeResponse filme = await BuscaFilmeAsync(id);
-            request.Atualizar(filme);
+            Filme filme = await RecuperarFilme(id);
+            filme.Atualizar(request);
 
-            _dbContext.Filmes.Update(request.MapRequestToFilme());
+            _dbContext.Filmes.Update(filme);
             int registrosAfetados = await _dbContext.SaveChangesAsync();
 
             return registrosAfetados > 0 ? "Atualizado com sucesso." : throw new Exception("Não foi possível atualizar o filme.");
@@ -89,9 +88,8 @@ public class FilmeRepository : IFilmeRepository
         try
         {
             EhIdValido(id);
-            FilmeResponse filmeResponse = await BuscaFilmeAsync(id);
 
-            _dbContext.Filmes.Remove(filmeResponse.MapFilmeResponseToFilme());
+            _dbContext.Filmes.Remove(await RecuperarFilme(id));
             int registrosAfetados = await _dbContext.SaveChangesAsync();
 
             return registrosAfetados > 0 ? "Deletado com sucesso." : throw new Exception("Não foi possível deletar o filme.");
@@ -100,5 +98,9 @@ public class FilmeRepository : IFilmeRepository
         {
             throw;
         }
+    }
+    private async Task<Filme> RecuperarFilme(int id)
+    {
+        return await _dbContext.Filmes.FindAsync(id) ?? throw new Exception("Filme não encontrado");
     }
 }

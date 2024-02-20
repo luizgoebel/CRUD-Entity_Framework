@@ -17,7 +17,14 @@ public class FilmesController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> Get()
     {
-        return Ok(await _filmeRepository.BuscaFilmesAsync());
+        try
+        {
+            return Ok(await _filmeRepository.BuscaFilmesAsync());
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
@@ -64,7 +71,6 @@ public class FilmesController : ControllerBase
         }
         catch (Exception ex)
         {
-
             return BadRequest(ex.Message);
         }
     }

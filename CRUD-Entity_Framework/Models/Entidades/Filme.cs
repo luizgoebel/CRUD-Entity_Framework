@@ -11,6 +11,12 @@ public class Filme
         Ano = ano;
         ProdutoraId = produtoraId;
     }
+    public Filme(int id, string nome, int ano)
+    {
+        Id = id;
+        Nome = nome;
+        Ano = ano;
+    }
     public Filme(string nome, int ano)
     {
         Nome = nome;
@@ -25,13 +31,16 @@ public class Filme
     [NotMapped]
     public virtual Produtora? Produtora { get; set; }
 
-    public FilmeResponse MapFilmeResponseToFilme()
+    public FilmeResponse MapFilmeResponseToFilme() => new()
     {
-        return new FilmeResponse()
-        {
-            Nome = this.Nome,
-            Ano = this.Ano,
-            Produtora = this.Produtora.Nome
-        };
+        Id = this.Id,
+        Nome = this.Nome,
+        Ano = this.Ano,
+        Produtora = this.Produtora.Nome
+    };
+    public void Atualizar(FilmeRequest request)
+    {
+        if (request.Ano > 0) this.Ano = request.Ano;
+        if (!string.IsNullOrEmpty(request.Nome)) this.Nome = request.Nome;
     }
 }
