@@ -7,21 +7,24 @@ namespace CRUD_Entity_Framework.Repository;
 
 public class FilmeRepository : IFilmeRepository
 {
-    private readonly FilmeContext _context;
+    private readonly FilmeContext _dbContext;
 
     public FilmeRepository(FilmeContext filmeContext)
     {
-        _context = filmeContext;
+        _dbContext = filmeContext;
     }
 
-    public async void AdicionarAsync(FilmeRequest request)
+    public async Task<string> AdicionarAsync(FilmeRequest request)
     {
         try
         {
             if (!request.EhValido())
                 throw new Exception("Informações inválidas");
 
-            await _context.Filmes.AddAsync(request.MapRequestToFilme());
+            await _dbContext.Filmes.AddAsync(request.MapRequestToFilme());
+            int registrosAfetados = await _dbContext.SaveChangesAsync();
+
+            return registrosAfetados > 0 ? "Adicionado com sucesso." : throw new Exception("Não foi possível adicionar o filme.");
 
         }
         catch (Exception)
@@ -30,14 +33,17 @@ public class FilmeRepository : IFilmeRepository
         }
     }
 
-    public async void AtualizarAsync(FilmeRequest request, int id)
+    public async Task<string> AtualizarAsync(FilmeRequest request, int id)
     {
         try
         {
             FilmeResponse filme = await BuscaFilmeAsync(id);
             request.Atualizar(filme);
 
-            _context.Filmes.Update(request.MapRequestToFilme());
+            _dbContext.Filmes.Update(request.MapRequestToFilme());
+            int registrosAfetados = await _dbContext.SaveChangesAsync();
+
+            return registrosAfetados > 0 ? "Atualizado com sucesso." : throw new Exception("Não foi possível atualizar o filme.");
         }
         catch (Exception)
         {
@@ -51,7 +57,7 @@ public class FilmeRepository : IFilmeRepository
         {
             EhIdValido(id);
 
-            Filme filme = await _context.Filmes.Include(x => x.Produtora).FirstOrDefaultAsync(x => x.Id.Equals(id)) ?? throw new Exception("Filme não encontrado.");
+            Filme filme = await _dbContext.Filmes.Include(x => x.Produtora).FirstOrDefaultAsync(x => x.Id.Equals(id)) ?? throw new Exception("Filme não encontrado.");
             return filme.MapFilmeResponseToFilme();
         }
         catch (Exception)
@@ -69,7 +75,8 @@ public class FilmeRepository : IFilmeRepository
     {
         try
         {
-            return _context.Filmes.Include(x => x.Produtora).Select(x => x.MapFilmeResponseToFilme()).ToList();
+            IEnumerable<FilmeResponse> filmes = _dbContext.Filmes.Include(x => x.Produtora).Select(x => x.MapFilmeResponseToFilme()).ToList();
+            return filmes.Any() ? filmes : throw new Exception("Não há nenhum filme na lista.");
         }
         catch (Exception)
         {
@@ -77,14 +84,17 @@ public class FilmeRepository : IFilmeRepository
         }
     }
 
-    public async void DeletarFilmeAsync(int id)
+    public async Task<string> DeletarFilmeAsync(int id)
     {
         try
         {
             EhIdValido(id);
             FilmeResponse filmeResponse = await BuscaFilmeAsync(id);
 
-            _context.Filmes.Remove(filmeResponse.MapFilmeResponseToFilme());
+            _dbContext.Filmes.Remove(filmeResponse.MapFilmeResponseToFilme());
+            int registrosAfetados = await _dbContext.SaveChangesAsync();
+
+            return registrosAfetados > 0 ? "Deletado com sucesso." : throw new Exception("Não foi possível deletar o filme.");
         }
         catch (Exception)
         {

@@ -36,8 +36,7 @@ public class FilmesController : ControllerBase
     {
         try
         {
-            _filmeRepository.AdicionarAsync(request);
-            return Ok();
+            return Ok(await _filmeRepository.AdicionarAsync(request));
         }
         catch (Exception ex)
         {
@@ -49,8 +48,7 @@ public class FilmesController : ControllerBase
     {
         try
         {
-            _filmeRepository.AtualizarAsync(request, id);
-            return Ok();
+            return Ok(await _filmeRepository.AtualizarAsync(request, id));
         }
         catch (Exception ex)
         {
@@ -62,8 +60,7 @@ public class FilmesController : ControllerBase
     {
         try
         {
-            _filmeRepository.DeletarFilmeAsync(id);
-            return Ok();
+            return Ok(await _filmeRepository.DeletarFilmeAsync(id));
         }
         catch (Exception ex)
         {
